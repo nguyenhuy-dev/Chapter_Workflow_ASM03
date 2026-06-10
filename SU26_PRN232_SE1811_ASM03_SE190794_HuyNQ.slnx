@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MangaWorkflow.APIGrpcService.HuyNQ/MangaWorkflow.APIGrpcService.HuyNQ.csproj" />
+  <Project Path="MangaWorkflow.Entities.HuyNQ/MangaWorkflow.Entities.HuyNQ.csproj" />
+  <Project Path="MangaWorkflow.Repositories.HuyNQ/MangaWorkflow.Repositories.HuyNQ.csproj" />
+  <Project Path="MangaWorkflow.Services.HuyNQ/MangaWorkflow.Services.HuyNQ.csproj" />
+</Solution>

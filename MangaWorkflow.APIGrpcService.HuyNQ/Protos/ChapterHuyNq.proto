@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option csharp_namespace = "MangaWorkflow.APIGrpcService.HuyNQ.Protos";
+
+service ChapterHuyNqGRPC {
+	// Queries
+	rpc GetAllAsync(EmptyRequest) returns (ChapterHuyNqList);
+    rpc GetByIdAsync(ChapterIdRequest) returns (ChapterHuyNq);
+
+    // Mutations
+    rpc CreateAsync(ChapterHuyNq) returns (MutationResult);
+    rpc UpdateAsync(ChapterHuyNq) returns (MutationResult);
+    rpc DeleteAsync(ChapterIdRequest) returns (MutationResult);
+}
+
+message EmptyRequest { }
+
+message ChapterHuyNqList {
+	repeated ChapterHuyNq Items = 1;
+}
+
+message ChapterHuyNq {
+	int32 HuynqId = 1;
+
+    int32 ChapterMetaHuynqId = 2;
+
+    string Title = 3;
+
+    int32 ChapterNumber = 4;
+
+    int32 PageCount = 5;
+
+    bool Approved = 6;
+
+    string ReleaseDate = 7;
+
+    int32 PriorityLevel = 8;
+
+    string EditorComment = 9;
+
+    string LayoutVersion = 10;
+
+    string ReviewNotes = 11;
+
+    // virtual ChapterMetaHuyNq ChapterMetaHuynq = ;
+}
+
+message ChapterIdRequest {
+    int32 HuynqId = 1;
+}
+
+message MutationResult {
+    int32 result = 1;
+}
