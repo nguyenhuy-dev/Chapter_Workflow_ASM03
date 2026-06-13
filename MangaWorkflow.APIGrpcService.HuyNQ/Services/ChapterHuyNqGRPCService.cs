@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MangaWorkflow.APIGrpcService.HuyNQ.Protos;
 using MangaWorkflow.Services.HuyNQ;
+using MangaWorkflow.Services.HuyNQ.DTOs.Chapter;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -28,29 +29,96 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex);
         }
 
         return results;
     }
 
-    public override Task<ChapterHuyNq> GetByIdAsync(ChapterIdRequest request, ServerCallContext context)
+    public override async Task<ChapterHuyNq> GetByIdAsync(ChapterIdRequest request, ServerCallContext context)
     {
-        return base.GetByIdAsync(request, context);
+        var result = new ChapterHuyNq();
+        try
+        {
+            var item = await _chapterService.GetByIdAsync(request.HuynqId);
+
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
+            var itemJsonString = JsonSerializer.Serialize(item, opt);
+
+            result = JsonSerializer.Deserialize<ChapterHuyNq>(itemJsonString);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return result ?? new();
     }
 
-    public override Task<MutationResult> CreateAsync(ChapterHuyNq request, ServerCallContext context)
+    public override async Task<MutationResult> CreateAsync(ChapterHuyNq request, ServerCallContext context)
     {
-        return base.CreateAsync(request, context);
+        MutationResult mutationResult = new();
+
+        try
+        {
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
+            var itesmJsonString = JsonSerializer.Serialize(request, opt);
+
+            var item = JsonSerializer.Deserialize<ChapterCreateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+
+            var result = await _chapterService.CreateAsync(item);
+
+            mutationResult.Result = result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return mutationResult;
     }
 
-    public override Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
+    public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
     {
-        return base.UpdateAsync(request, context);
+        MutationResult mutationResult = new();
+
+        try
+        {
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
+            var itesmJsonString = JsonSerializer.Serialize(request, opt);
+
+            var item = JsonSerializer.Deserialize<ChapterUpdateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+
+            var result = await _chapterService.UpdateAsync(request.HuynqId, item);
+
+            mutationResult.Result = result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return mutationResult;
     }
 
-    public override Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
+    public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
     {
-        return base.DeleteAsync(request, context);
+        MutationResult mutationResult = new();
+
+        try
+        {
+            var result = await _chapterService.DeleteAsync(request.HuynqId);
+
+            mutationResult.Result = result == true ? 1 : 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return mutationResult;
     }
 }
