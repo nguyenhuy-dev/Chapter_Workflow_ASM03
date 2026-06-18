@@ -55,7 +55,7 @@ message MutationResult {
 }
 
 message ChapterSearchRequest {
-    string Title = 1;
-    int32 ChapterNumber = 2;
-    bool Approved = 3;
+    optional string Title = 1;
+    optional int32 ChapterNumber = 2;
+    optional bool Approved = 3;
 }

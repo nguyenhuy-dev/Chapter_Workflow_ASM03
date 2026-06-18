@@ -60,7 +60,10 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
     {
         try
         {
-            var items = await _chapterService.SearchAsync(new MangaWorkflow.Services.HuyNQ.DTOs.Chapter.ChapterSearchRequest(request.Title, request.ChapterNumber, request.Approved));
+            var items = await _chapterService.SearchAsync(new MangaWorkflow.Services.HuyNQ.DTOs.Chapter.ChapterSearchRequest(
+                request.HasTitle ? request.Title : null,
+                request.HasChapterNumber ? request.ChapterNumber : null,
+                request.HasApproved ? request.Approved : null));
 
             var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
