@@ -56,69 +56,96 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return result ?? new();
     }
 
+    public override async Task<ChapterHuyNqList> SearchAsync(Protos.ChapterSearchRequest request, ServerCallContext context)
+    {
+        try
+        {
+            var items = await _chapterService.SearchAsync(new MangaWorkflow.Services.HuyNQ.DTOs.Chapter.ChapterSearchRequest(request.Title, request.ChapterNumber, request.Approved));
+
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
+            var itemsJsonString = JsonSerializer.Serialize(items, opt);
+
+            var itemsDeserialize = JsonSerializer.Deserialize<List<ChapterHuyNq>>(itemsJsonString);
+
+            var result = new ChapterHuyNqList();
+
+            if (itemsDeserialize != null)
+                result.Items.AddRange(itemsDeserialize);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return new ();
+    }
+
     public override async Task<MutationResult> CreateAsync(ChapterHuyNq request, ServerCallContext context)
+{
+    MutationResult mutationResult = new();
+
+    try
     {
-        MutationResult mutationResult = new();
+        var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
-        try
-        {
-            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+        var itesmJsonString = JsonSerializer.Serialize(request, opt);
 
-            var itesmJsonString = JsonSerializer.Serialize(request, opt);
+        var item = JsonSerializer.Deserialize<ChapterCreateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
 
-            var item = JsonSerializer.Deserialize<ChapterCreateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+        var result = await _chapterService.CreateAsync(item);
 
-            var result = await _chapterService.CreateAsync(item);
-
-            mutationResult.Result = result;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
-
-        return mutationResult;
+        mutationResult.Result = result;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex);
     }
 
-    public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
+    return mutationResult;
+}
+
+public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
+{
+    MutationResult mutationResult = new();
+
+    try
     {
-        MutationResult mutationResult = new();
+        var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
-        try
-        {
-            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+        var itesmJsonString = JsonSerializer.Serialize(request, opt);
 
-            var itesmJsonString = JsonSerializer.Serialize(request, opt);
+        var item = JsonSerializer.Deserialize<ChapterUpdateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
 
-            var item = JsonSerializer.Deserialize<ChapterUpdateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+        var result = await _chapterService.UpdateAsync(request.HuynqId, item);
 
-            var result = await _chapterService.UpdateAsync(request.HuynqId, item);
-
-            mutationResult.Result = result;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
-
-        return mutationResult;
+        mutationResult.Result = result;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex);
     }
 
-    public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
+    return mutationResult;
+}
+
+public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
+{
+    MutationResult mutationResult = new();
+
+    try
     {
-        MutationResult mutationResult = new();
+        var result = await _chapterService.DeleteAsync(request.HuynqId);
 
-        try
-        {
-            var result = await _chapterService.DeleteAsync(request.HuynqId);
-
-            mutationResult.Result = result == true ? 1 : 0;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
-
-        return mutationResult;
+        mutationResult.Result = result == true ? 1 : 0;
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex);
+    }
+
+    return mutationResult;
+}
 }

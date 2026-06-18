@@ -6,6 +6,7 @@ service ChapterHuyNqGRPC {
 	// Queries
 	rpc GetAllAsync(EmptyRequest) returns (ChapterHuyNqList);
     rpc GetByIdAsync(ChapterIdRequest) returns (ChapterHuyNq);
+    rpc SearchAsync(ChapterSearchRequest) returns (ChapterHuyNqList);
 
     // Mutations
     rpc CreateAsync(ChapterHuyNq) returns (MutationResult);
@@ -51,4 +52,10 @@ message ChapterIdRequest {
 
 message MutationResult {
     int32 result = 1;
+}
+
+message ChapterSearchRequest {
+    string Title = 1;
+    int32 ChapterNumber = 2;
+    bool Approved = 3;
 }
