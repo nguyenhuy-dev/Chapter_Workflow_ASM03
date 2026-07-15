@@ -1,7 +1,8 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MangaWorkflow.APIGrpcService.HuyNQ.Protos;
 using MangaWorkflow.Services.HuyNQ;
 using MangaWorkflow.Services.HuyNQ.DTOs.Chapter;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -87,68 +88,95 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
     }
 
     public override async Task<MutationResult> CreateAsync(ChapterHuyNq request, ServerCallContext context)
-{
-    MutationResult mutationResult = new();
-
-    try
     {
-        var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+        MutationResult mutationResult = new();
 
-        var itesmJsonString = JsonSerializer.Serialize(request, opt);
+        try
+        {
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
-        var item = JsonSerializer.Deserialize<ChapterCreateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+            var itesmJsonString = JsonSerializer.Serialize(request, opt);
 
-        var result = await _chapterService.CreateAsync(item);
+            var item = JsonSerializer.Deserialize<ChapterCreateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
 
-        mutationResult.Result = result;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex);
-    }
+            ValidateOrThrow(item);
 
-    return mutationResult;
-}
+            var result = await _chapterService.CreateAsync(item);
 
-public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
-{
-    MutationResult mutationResult = new();
+            mutationResult.Result = result;
+        }
+        catch (RpcException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
 
-    try
-    {
-        var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-
-        var itesmJsonString = JsonSerializer.Serialize(request, opt);
-
-        var item = JsonSerializer.Deserialize<ChapterUpdateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
-
-        var result = await _chapterService.UpdateAsync(request.HuynqId, item);
-
-        mutationResult.Result = result;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex);
+        return mutationResult;
     }
 
-    return mutationResult;
-}
-
-public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
-{
-    MutationResult mutationResult = new();
-
-    try
+    public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
     {
-        var result = await _chapterService.DeleteAsync(request.HuynqId);
+        MutationResult mutationResult = new();
 
-        mutationResult.Result = result == true ? 1 : 0;
+        try
+        {
+            var opt = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
+            var itesmJsonString = JsonSerializer.Serialize(request, opt);
+
+            var item = JsonSerializer.Deserialize<ChapterUpdateRequest>(itesmJsonString, opt) ?? throw new InvalidDataException("Body invalid");
+
+            ValidateOrThrow(item);
+
+            var result = await _chapterService.UpdateAsync(request.HuynqId, item);
+
+            mutationResult.Result = result;
+        }
+        catch (RpcException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return mutationResult;
     }
-    catch (Exception ex)
+
+    public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
     {
-        Console.WriteLine(ex);
+        MutationResult mutationResult = new();
+
+        try
+        {
+            var result = await _chapterService.DeleteAsync(request.HuynqId);
+
+            mutationResult.Result = result == true ? 1 : 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return mutationResult;
     }
 
-    return mutationResult;
-}
+    // Mirrors the DataAnnotations validation ASP.NET performs automatically for
+    // [ApiController] endpoints. gRPC has no built-in model validation, so we run
+    // it by hand and surface failures as an InvalidArgument status to the client.
+    private static void ValidateOrThrow(object dto)
+    {
+        var validationContext = new ValidationContext(dto);
+        var validationResults = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(dto, validationContext, validationResults, validateAllProperties: true))
+        {
+            var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
+            throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
+        }
+    }
 }

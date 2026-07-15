@@ -13,10 +13,12 @@
   <ItemGroup>
     <Protobuf Include="Protos\ChapterHuyNq.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\SystemUserAccount.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.27" />
     <PackageReference Include="protobuf-net" Version="3.2.56" />
   </ItemGroup>
 

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option csharp_namespace = "MangaWorkflow.APIGrpcService.HuyNQ.Protos";
+
+package auth;
+
+service SystemUserAccountGRPC {
+    // Authenticates a user and returns a signed JWT.
+    rpc Login(LoginRequest) returns (LoginReply);
+
+    // Revokes the caller's JWT so it can no longer be used.
+    rpc Logout(LogoutRequest) returns (LogoutReply);
+}
+
+message LoginRequest {
+    string UserName = 1;
+    string Password = 2;
+}
+
+message LoginReply {
+    string Token = 1;
+}
+
+message LogoutRequest { }
+
+message LogoutReply {
+    int32 StatusCode = 1;
+    string Message = 2;
+}
