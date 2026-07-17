@@ -11,7 +11,7 @@ public class ChapterCreateRequest
     [StringLength(255, MinimumLength = 1, ErrorMessage = "Title must be between 1 and 255 characters.")]
     public string Title { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "ChapterNumber must be a positive number.")]
+    [Range(1, int.MaxValue, ErrorMessage = "ChapterNumber must be a .")]
     public int? ChapterNumber { get; set; }
 
     [Range(0, int.MaxValue, ErrorMessage = "PageCount cannot be negative.")]

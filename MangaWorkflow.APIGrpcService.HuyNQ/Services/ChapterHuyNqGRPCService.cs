@@ -2,6 +2,7 @@ using Grpc.Core;
 using MangaWorkflow.APIGrpcService.HuyNQ.Protos;
 using MangaWorkflow.Services.HuyNQ;
 using MangaWorkflow.Services.HuyNQ.DTOs.Chapter;
+using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,6 +13,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
 {
     private readonly IChapterHuyNqService _chapterService = chapterService;
 
+    [Authorize]
     public override async Task<ChapterHuyNqList> GetAllAsync(EmptyRequest request, ServerCallContext context)
     {
         var results = new ChapterHuyNqList();
@@ -36,6 +38,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return results;
     }
 
+    [Authorize(Roles = "1, 2")]
     public override async Task<ChapterHuyNq> GetByIdAsync(ChapterIdRequest request, ServerCallContext context)
     {
         var result = new ChapterHuyNq();
@@ -57,6 +60,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return result ?? new();
     }
 
+    [Authorize]
     public override async Task<ChapterHuyNqList> SearchAsync(Protos.ChapterSearchRequest request, ServerCallContext context)
     {
         try
@@ -87,6 +91,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return new ();
     }
 
+    [Authorize(Roles = "1")]
     public override async Task<MutationResult> CreateAsync(ChapterHuyNq request, ServerCallContext context)
     {
         MutationResult mutationResult = new();
@@ -117,6 +122,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return mutationResult;
     }
 
+    [Authorize(Roles = "1")]
     public override async Task<MutationResult> UpdateAsync(ChapterHuyNq request, ServerCallContext context)
     {
         MutationResult mutationResult = new();
@@ -147,6 +153,7 @@ public class ChapterHuyNqGRPCService(IChapterHuyNqService chapterService) : Chap
         return mutationResult;
     }
 
+    [Authorize(Roles = "1")]
     public override async Task<MutationResult> DeleteAsync(ChapterIdRequest request, ServerCallContext context)
     {
         MutationResult mutationResult = new();
